@@ -1,10 +1,8 @@
 from django.contrib import admin
-from .models_fivem import *
+from .models import Users, Vehicles, OwnedVehicles, VehicleCategories, VehicleSold, Banking, Billing, Houselocations, PlayerHouses, Items, AddonInventory, AddonInventoryItems, KavesMechanics, MechanicVehicledata, MechanicEmployees  # i wszystkie pozostałe, których chcesz użyć
 
-# -------------------------
-# Użytkownicy / gracze
-# -------------------------
-@admin.register(Userss)
+# Rejestracja Users
+@admin.register(Users)
 class UsersAdmin(admin.ModelAdmin):
     list_display = ('identifier', 'firstname', 'lastname', 'job', 'job_grade', 'phone_number', 'playtime')
     search_fields = ('identifier', 'firstname', 'lastname', 'job', 'phone_number')
