@@ -1,7 +1,9 @@
 from django.contrib import admin
-from .models import Users, Vehicles, OwnedVehicles, VehicleCategories, VehicleSold, Banking, Billing, Houselocations, PlayerHouses, Items, AddonInventory, AddonInventoryItems, KavesMechanics, MechanicVehicledata, MechanicEmployees  # i wszystkie pozostałe, których chcesz użyć
+from .models_fivem import *
 
-# Rejestracja Users
+# -------------------------
+# Użytkownicy / gracze
+# -------------------------
 @admin.register(Users)
 class UsersAdmin(admin.ModelAdmin):
     list_display = ('identifier', 'firstname', 'lastname', 'job', 'job_grade', 'phone_number', 'playtime')
@@ -54,7 +56,7 @@ class HouselocationsAdmin(admin.ModelAdmin):
 
 @admin.register(PlayerHouses)
 class PlayerHousesAdmin(admin.ModelAdmin):
-    list_display = ('owner', 'house', 'apartment')
+    list_display = ('owner', 'house')  # usunięto 'apartment', jeśli nie istnieje w modelu
     search_fields = ('owner', 'house')
 
 # -------------------------
@@ -70,49 +72,26 @@ class AddonInventoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'label', 'shared')
 
 # -------------------------
-# Reszta modeli - tylko do podglądu (bez crashowania Gunicorna)
+# Reszta modeli - tylko do podglądu (readonly)
 # -------------------------
 readonly_models = [
     AddonAccount, AddonAccountData, Datastore, DatastoreData, FineTypes,
     HouseDecorations, HouseObjects, HousePlants, HouseRents, JobGrades, Jobs,
-    Licenses, ManagementOutfits, MulticharacterSlots, PhoneBackups, PhoneClockAlarms,
-    PhoneCrypto, PhoneDarkchatAccounts, PhoneDarkchatChannels, PhoneDarkchatMembers,
-    PhoneDarkchatMessages, PhoneInstagramAccounts, PhoneInstagramComments,
-    PhoneInstagramFollowRequests, PhoneInstagramFollows, PhoneInstagramLikes,
-    PhoneInstagramMessages, PhoneInstagramNotifications, PhoneInstagramPosts,
-    PhoneInstagramStories, PhoneInstagramStoriesViews, PhoneLastPhone,
-    PhoneLoggedInAccounts, PhoneMailAccounts, PhoneMailDeleted, PhoneMailMessages,
-    PhoneMapsLocations, PhoneMarketplacePosts, PhoneMessageChannels, PhoneMessageMembers,
-    PhoneMessageMessages, PhoneMusicPlaylists, PhoneMusicSavedPlaylists, PhoneMusicSongs,
-    PhoneNotes, PhoneNotifications, PhonePhoneBlockedNumbers, PhonePhoneCalls,
-    PhonePhoneContacts, PhonePhoneVoicemail, PhonePhones, PhonePhotoAlbumMembers,
-    PhonePhotoAlbumPhotos, PhonePhotoAlbums, PhonePhotos, PhoneServicesChannels,
-    PhoneServicesMessages, PhoneTiktokAccounts, PhoneTiktokChannels,
-    PhoneTiktokComments, PhoneTiktokCommentsLikes, PhoneTiktokFollows,
-    PhoneTiktokLikes, PhoneTiktokMessages, PhoneTiktokNotifications,
-    PhoneTiktokPinnedVideos, PhoneTiktokSaves, PhoneTiktokUnreadMessages,
-    PhoneTiktokVideos, PhoneTiktokViews, PhoneTinderAccounts, PhoneTinderMatches,
-    PhoneTinderMessages, PhoneTinderSwipes, PhoneTwitterAccounts,
-    PhoneTwitterFollowRequests, PhoneTwitterFollows, PhoneTwitterHashtags,
-    PhoneTwitterLikes, PhoneTwitterMessages, PhoneTwitterNotifications,
-    PhoneTwitterPromoted, PhoneTwitterRetweets, PhoneTwitterTweets,
-    PhoneVoiceMemosRecordings, PhoneWalletTransactions, PhoneYellowPagesPosts,
+    Licenses, ManagementOutfits, MulticharacterSlots,
     CardealerVehicles, RealVehicleshop, RentedVehicles, SocietyMoneywash,
     TrackTimes, RacerNames, RacingCrews, RacingRaces, Whitelist
 ]
 
 for model in readonly_models:
     try:
-        class ReadonlyAdmin(admin.ModelAdmin):
-            # tylko do podglądu
-            list_display = [f.name for f in model._meta.fields]
-            search_fields = []
-            readonly_fields = [f.name for f in model._meta.fields]
-            can_delete = False
-            def has_add_permission(self, request):
-                return False
-            def has_change_permission(self, request, obj=None):
-                return False
-        admin.site.register(model, ReadonlyAdmin)
+        admin_class = type(f"{model.__name__}Admin", (admin.ModelAdmin,), {
+            "list_display": [f.name for f in model._meta.fields],
+            "readonly_fields": [f.name for f in model._meta.fields],
+            "search_fields": [],
+            "can_delete": False,
+            "has_add_permission": lambda self, request: False,
+            "has_change_permission": lambda self, request, obj=None: False,
+        })
+        admin.site.register(model, admin_class)
     except admin.sites.AlreadyRegistered:
         pass
