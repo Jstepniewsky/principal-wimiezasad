@@ -71,63 +71,50 @@ class ItemsAdmin(admin.ModelAdmin):
 class AddonInventoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'label', 'shared')
 
-@admin.register(AddonInventoryItems)
-class AddonInventoryItemsAdmin(admin.ModelAdmin):
-    list_display = ('inventory_name', 'name', 'count', 'owner')
-    search_fields = ('inventory_name', 'name', 'owner')
-
 # -------------------------
-# Mechanik / warsztat
+# Reszta modeli - tylko do podglądu (bez crashowania Gunicorna)
 # -------------------------
-@admin.register(KavesMechanics)
-class KavesMechanicsAdmin(admin.ModelAdmin):
-    list_display = ('identifier', 'name', 'label')
-    search_fields = ('identifier', 'name')
-
-@admin.register(MechanicVehicledata)
-class MechanicVehicledataAdmin(admin.ModelAdmin):
-    list_display = ('owner', 'vehicle', 'plate')
-    search_fields = ('owner', 'vehicle', 'plate')
-
-@admin.register(MechanicEmployees)
-class MechanicEmployeesAdmin(admin.ModelAdmin):
-    list_display = ('boss', 'employee', 'job')
-    search_fields = ('boss', 'employee', 'job')
-
-# -------------------------
-# Automatyczna rejestracja pozostałych tabel (do podglądu)
-# -------------------------
-# Lista wszystkich pozostałych modeli
-remaining_models = [
+readonly_models = [
     AddonAccount, AddonAccountData, Datastore, DatastoreData, FineTypes,
-    HouseDecorations, HouseObjects, HousePlants, HouseRents,
-    JobGrades, Jobs, Licenses, ManagementOutfits, MulticharacterSlots,
-    PhoneBackups, PhoneClockAlarms, PhoneCrypto, PhoneDarkchatAccounts,
-    PhoneDarkchatChannels, PhoneDarkchatMembers, PhoneDarkchatMessages,
-    PhoneInstagramAccounts, PhoneInstagramComments, PhoneInstagramFollowRequests,
-    PhoneInstagramFollows, PhoneInstagramLikes, PhoneInstagramMessages,
-    PhoneInstagramNotifications, PhoneInstagramPosts, PhoneInstagramStories,
-    PhoneInstagramStoriesViews, PhoneLastPhone, PhoneLoggedInAccounts, PhoneMailAccounts,
-    PhoneMailDeleted, PhoneMailMessages, PhoneMapsLocations, PhoneMarketplacePosts,
-    PhoneMessageChannels, PhoneMessageMembers, PhoneMessageMessages, PhoneMusicPlaylists,
-    PhoneMusicSavedPlaylists, PhoneMusicSongs, PhoneNotes, PhoneNotifications,
-    PhonePhoneBlockedNumbers, PhonePhoneCalls, PhonePhoneContacts, PhonePhoneVoicemail,
-    PhonePhones, PhonePhotoAlbumMembers, PhonePhotoAlbumPhotos, PhonePhotoAlbums,
-    PhonePhotos, PhoneServicesChannels, PhoneServicesMessages, PhoneTiktokAccounts,
-    PhoneTiktokChannels, PhoneTiktokComments, PhoneTiktokCommentsLikes, PhoneTiktokFollows,
-    PhoneTiktokLikes, PhoneTiktokMessages, PhoneTiktokNotifications, PhoneTiktokPinnedVideos,
-    PhoneTiktokSaves, PhoneTiktokUnreadMessages, PhoneTiktokVideos, PhoneTiktokViews,
-    PhoneTinderAccounts, PhoneTinderMatches, PhoneTinderMessages, PhoneTinderSwipes,
-    PhoneTwitterAccounts, PhoneTwitterFollowRequests, PhoneTwitterFollows,
-    PhoneTwitterHashtags, PhoneTwitterLikes, PhoneTwitterMessages, PhoneTwitterNotifications,
+    HouseDecorations, HouseObjects, HousePlants, HouseRents, JobGrades, Jobs,
+    Licenses, ManagementOutfits, MulticharacterSlots, PhoneBackups, PhoneClockAlarms,
+    PhoneCrypto, PhoneDarkchatAccounts, PhoneDarkchatChannels, PhoneDarkchatMembers,
+    PhoneDarkchatMessages, PhoneInstagramAccounts, PhoneInstagramComments,
+    PhoneInstagramFollowRequests, PhoneInstagramFollows, PhoneInstagramLikes,
+    PhoneInstagramMessages, PhoneInstagramNotifications, PhoneInstagramPosts,
+    PhoneInstagramStories, PhoneInstagramStoriesViews, PhoneLastPhone,
+    PhoneLoggedInAccounts, PhoneMailAccounts, PhoneMailDeleted, PhoneMailMessages,
+    PhoneMapsLocations, PhoneMarketplacePosts, PhoneMessageChannels, PhoneMessageMembers,
+    PhoneMessageMessages, PhoneMusicPlaylists, PhoneMusicSavedPlaylists, PhoneMusicSongs,
+    PhoneNotes, PhoneNotifications, PhonePhoneBlockedNumbers, PhonePhoneCalls,
+    PhonePhoneContacts, PhonePhoneVoicemail, PhonePhones, PhonePhotoAlbumMembers,
+    PhonePhotoAlbumPhotos, PhonePhotoAlbums, PhonePhotos, PhoneServicesChannels,
+    PhoneServicesMessages, PhoneTiktokAccounts, PhoneTiktokChannels,
+    PhoneTiktokComments, PhoneTiktokCommentsLikes, PhoneTiktokFollows,
+    PhoneTiktokLikes, PhoneTiktokMessages, PhoneTiktokNotifications,
+    PhoneTiktokPinnedVideos, PhoneTiktokSaves, PhoneTiktokUnreadMessages,
+    PhoneTiktokVideos, PhoneTiktokViews, PhoneTinderAccounts, PhoneTinderMatches,
+    PhoneTinderMessages, PhoneTinderSwipes, PhoneTwitterAccounts,
+    PhoneTwitterFollowRequests, PhoneTwitterFollows, PhoneTwitterHashtags,
+    PhoneTwitterLikes, PhoneTwitterMessages, PhoneTwitterNotifications,
     PhoneTwitterPromoted, PhoneTwitterRetweets, PhoneTwitterTweets,
     PhoneVoiceMemosRecordings, PhoneWalletTransactions, PhoneYellowPagesPosts,
     CardealerVehicles, RealVehicleshop, RentedVehicles, SocietyMoneywash,
     TrackTimes, RacerNames, RacingCrews, RacingRaces, Whitelist
 ]
 
-for model in remaining_models:
+for model in readonly_models:
     try:
-        admin.site.register(model)
+        class ReadonlyAdmin(admin.ModelAdmin):
+            # tylko do podglądu
+            list_display = [f.name for f in model._meta.fields]
+            search_fields = []
+            readonly_fields = [f.name for f in model._meta.fields]
+            can_delete = False
+            def has_add_permission(self, request):
+                return False
+            def has_change_permission(self, request, obj=None):
+                return False
+        admin.site.register(model, ReadonlyAdmin)
     except admin.sites.AlreadyRegistered:
         pass
