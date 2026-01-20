@@ -15,9 +15,9 @@ class UsersAdmin(admin.ModelAdmin):
 # -------------------------
 @admin.register(Vehicles)
 class VehiclesAdmin(admin.ModelAdmin):
-    list_display = ('plate', 'model', 'owner')
+    list_display = ('model')
     search_fields = ('plate', 'model', 'owner')
-    list_filter = ('garage',)
+    list_filter = ()
 
 @admin.register(OwnedVehicles)
 class OwnedVehiclesAdmin(admin.ModelAdmin):
@@ -26,11 +26,11 @@ class OwnedVehiclesAdmin(admin.ModelAdmin):
 
 @admin.register(VehicleCategories)
 class VehicleCategoriesAdmin(admin.ModelAdmin):
-    list_display = ('category', 'label')
+    list_display = ('name', 'label')
 
 @admin.register(VehicleSold)
 class VehicleSoldAdmin(admin.ModelAdmin):
-    list_display = ('buyer', 'vehicle', 'price')
+    list_display = ('client', 'model')
 
 # -------------------------
 # Bank / billing

@@ -299,7 +299,7 @@ class HouseRents(models.Model):
 
 
 class Houselocations(models.Model):
-    id = models.AutoField()
+    id = models.AutoField(primary_key=True)
     name = models.CharField(primary_key=True, max_length=255)
     label = models.CharField(max_length=255, blank=True, null=True)
     coords = models.TextField(blank=True, null=True)
@@ -517,7 +517,7 @@ class PhoneBackups(models.Model):
 
 class PhoneClockAlarms(models.Model):
     pk = models.CompositePrimaryKey('id', 'phone_number')
-    id = models.AutoField()
+    id = models.AutoField(primary_key=True)
     phone_number = models.ForeignKey('PhonePhones', models.DO_NOTHING, db_column='phone_number', to_field='phone_number')
     hours = models.IntegerField()
     minutes = models.IntegerField()
@@ -1532,7 +1532,7 @@ class RacingRaces(models.Model):
 
 
 class RealVehicleshop(models.Model):
-    id = models.IntegerField(blank=True, null=True)
+    id = models.AutoField(primary_key=True) 
     information = models.TextField(blank=True, null=True)
     vehicles = models.TextField(blank=True, null=True)
     categories = models.TextField(blank=True, null=True)
