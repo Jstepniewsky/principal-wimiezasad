@@ -13,14 +13,16 @@ class UsersAdmin(admin.ModelAdmin):
 # -------------------------
 # Pojazdy
 # -------------------------
-@admin.register(Vehicles)
+@admin.register(Vehicles) 
 class VehiclesAdmin(admin.ModelAdmin):
-    list_display = ('model')
-    search_fields = ('plate', 'model', 'owner')
-    list_filter = ()
+    # zmiana
+    list_display = ['model'] 
+    search_fields = ['plate', 'model', 'owner']
+    list_filter = []
 
 @admin.register(OwnedVehicles)
 class OwnedVehiclesAdmin(admin.ModelAdmin):
+    # zmiana
     list_display = ('owner', 'vehicle', 'plate')
     search_fields = ('owner', 'vehicle', 'plate')
 

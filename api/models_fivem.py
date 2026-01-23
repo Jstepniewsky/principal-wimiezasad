@@ -300,7 +300,7 @@ class HouseRents(models.Model):
 
 class Houselocations(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(primary_key=True, max_length=255)
+    name = models.CharField(max_length=255)
     label = models.CharField(max_length=255, blank=True, null=True)
     coords = models.TextField(blank=True, null=True)
     owned = models.IntegerField(blank=True, null=True)
@@ -516,8 +516,9 @@ class PhoneBackups(models.Model):
 
 
 class PhoneClockAlarms(models.Model):
-    pk = models.CompositePrimaryKey('id', 'phone_number')
+    # zmiana
     id = models.AutoField(primary_key=True)
+    # zmiana
     phone_number = models.ForeignKey('PhonePhones', models.DO_NOTHING, db_column='phone_number', to_field='phone_number')
     hours = models.IntegerField()
     minutes = models.IntegerField()
@@ -1598,7 +1599,8 @@ class UserLicenses(models.Model):
 
 
 class Users(models.Model):
-    identifier = models.CharField(primary_key=True, max_length=46)
+    # ZMIANA
+    identifier = models.CharField(max_length=46, unique=True)
     ssn = models.CharField(unique=True, max_length=11)
     accounts = models.TextField(blank=True, null=True)
     group = models.CharField(max_length=50, blank=True, null=True)
@@ -1616,7 +1618,10 @@ class Users(models.Model):
     skin = models.TextField(blank=True, null=True)
     status = models.TextField(blank=True, null=True)
     is_dead = models.IntegerField(blank=True, null=True)
-    id = models.AutoField(unique=True)
+    
+    # ZMIANA
+    id = models.AutoField(primary_key=True)
+    
     disabled = models.IntegerField(blank=True, null=True)
     last_property = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(blank=True, null=True)
