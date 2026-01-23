@@ -79,9 +79,9 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'django_fivem',     # To jest ta nowa baza
-        'USER': 'django_admin',             # Na devie root jest OK
-        'PASSWORD': 'Hukus23rk', # Hasło roota mysql (często to samo co do sudo, albo puste)
+        'NAME': 'django_fivem',    
+        'USER': 'django_admin',            
+        'PASSWORD': 'Hukus23rk', 
         'HOST': '127.0.0.1',
         'PORT': '3306',
     }
