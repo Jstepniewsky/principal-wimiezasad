@@ -1,0 +1,8 @@
+
+rest api serializery itp - 23.01 
+co sie da teraz (w teorii)
+http://127.0.0.1:8000/api/users/
+
+
+http://127.0.0.1:8000/api/users/1/ (jeśli istnieje user o ID 1)
+

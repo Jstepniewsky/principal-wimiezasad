@@ -1,0 +1,51 @@
+4. Wymagania projektu.
+Zakres projektu zaliczeniowego:
+
+Modele:
+#4-5 adekwatnych do projektu modeli #jest w hvj tego - wybrac z tego najwazniejsze jak users i zrobic ponizej 
+*************************************************************************************
+Uwierzytelnianie (preferowany token) i autoryzacja.
+Co najmniej 2 konta z różnym poziomem dostępu do endpointów (np. admin, user)
+**Endpointy:***
+Rejestracja użytkownika aplikacji
+CRUD (Create, Read, Update, Delete)
+Minimum 2 endpointy, które wyjdą poza schemat CRUD, np. zestawienie miesięczne zamówień, lista wypożyczeń dla użytkownika, lista towarów zaczynających się od itp.
+**************************************************************************************
+Inne:
+"Idiotoodporność" - czyli żeby nie móc wpisać tekstu w miejsce daty oraz aby daty nie były z przeszłości, itd.
+Walidacja danych
+Sens i działanie (szeroko pojęte)
+5. Rozpiska
+Przygotowania środowiska pracy oraz utworzenia przykładowego projektu Django i omówienia jego struktury
+Omówienie i przydzielenie projektów. Zapoznanie z narzędziem wersjonowania projektu - GIT.
+Schemat bazy danych.
+Modele Django, migracja danych, Django admin panel. (2 zajęcia)
+Widoki i szablony Django z wykorzystaniem modeli i formularzy.
+REST API - serializacja, Django Rest Framework (2 zajęcia)
+Autentykacja
+Autoryzacja
+Testowanie aplikacji (opcjonalnie)
+Prezentacja i ocena projektów.
+6. Obecność i Oceny
+Na zajęciach sprawdzana będzie obecność. Dopuszczone są 3 nieobecności nieusprawiedliwione.
+
+Z zajęć uzyskać można maksymalnie 50 punktów, z czego:
+
+Systematyczność commitów (oraz ich sens) - max 5 pkt.
+Implementacja zagadnień przedstawionych na zajęciach - max. 5 pkt.
+Modele adekwatne do projektu - max. 5 pkt.
+Uprawnienia i konta - max. 5 pkt.
+Rejestracja i logowanie - max. 5 pkt.
+CRUD - max. 10 pkt.
+2 endpointy poza CRUD - max. 5 pkt.
+Walidacja - max. 5 pkt.
+"Idiotoodporność" - max. 5 pkt.
+Dla ukazania "ocen" (jeżeli byłoby to potrzebne z jakiś względów) suma punktów do ocen ukazuje się następująco:
+
+91%+ ===> 45,5+ pkt. ===> 5
+81 - 90% ===> 40,5 - 45 pkt ===> 4,5
+71 - 80% ===> 35,5 - 40 pkt ===> 4
+61 - 70% ===> 30,5 - 35 pkt ===> 3,5
+51 - 60% ===> 25,5 - 30 pkt ===> 3
+0 - 50% ===> 0 - 25 pkt ===> 2
+Innymi słowy trzeba uzyskać minimum 51% punktów, aby zaliczyć przedmiot.
