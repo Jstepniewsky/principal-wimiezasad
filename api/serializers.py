@@ -3,19 +3,16 @@ from .models_fivem import Users
 import json
 
 
-
-
 class UsersSerializer(serializers.ModelSerializer):
-    # Definiujemy czytelne pola wirtualne
     bank_money = serializers.SerializerMethodField()
     cash_money = serializers.SerializerMethodField()
     hunger = serializers.SerializerMethodField()
     thirst = serializers.SerializerMethodField()
+    vehicles = serializers.SerializerMethodField()
 
     class Meta:
         model = Users
-        # Tutaj wpisz TYLKO te pola, które chcesz widzieć w API. 
-        # Usuwamy 'skin', 'accounts', 'status' itp., żeby nie było śmietnika.
+        # Tutaj jedna, kompletna lista wszystkich pól
         fields = [
             'id', 
             'identifier', 
@@ -29,10 +26,9 @@ class UsersSerializer(serializers.ModelSerializer):
             'hunger',
             'thirst',
             'playtime',
-            'is_dead'
+            'is_dead',
+            'vehicles'
         ]
-
-    # --- LOGIKA WYCIĄGANIA DANYCH Z JSONÓW ---
 
     def get_bank_money(self, obj):
         try:
@@ -48,11 +44,10 @@ class UsersSerializer(serializers.ModelSerializer):
 
     def get_hunger(self, obj):
         try:
-            # Parsujemy status: [{"name":"hunger","val":488160}, ...]
             status_data = json.loads(obj.status)
             for s in status_data:
                 if s['name'] == 'hunger':
-                    return round(s['percent'], 1)
+                    return round(s['percent'] if 'percent' in s else 0, 1)
         except: return 0
 
     def get_thirst(self, obj):
@@ -60,5 +55,24 @@ class UsersSerializer(serializers.ModelSerializer):
             status_data = json.loads(obj.status)
             for s in status_data:
                 if s['name'] == 'thirst':
-                    return round(s['percent'], 1)
+                    return round(s['percent'] if 'percent' in s else 0, 1)
         except: return 0
+
+    def get_vehicles(self, obj):
+        cars = OwnedVehicles.objects.filter(owner=obj.identifier)
+        return OwnedVehiclesSerializer(cars, many=True).data
+    
+class OwnedVehiclesSerializer(serializers.ModelSerializer):
+    model_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = OwnedVehicles
+        fields = ['plate', 'model_name', 'type', 'stored', 'parking', 'mileage']
+
+    def get_model_name(self, obj):
+        try:
+            # Wyciągamy nazwę modelu z JSONa pojazdu
+            data = json.loads(obj.vehicle)
+            return data.get('model', 'Nieznany')
+        except:
+            return "Nieznany"
