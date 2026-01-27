@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models_fivem import Users
+from .models_fivem import Users, OwnedVehicles
+
 import json
 
 
