@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models_fivem import Users, OwnedVehicles
+from .models_fivem import Users, OwnedVehicles, UserLicenses, Licenses
 import json
 
 class UserLicensesSerializer(serializers.ModelSerializer):
