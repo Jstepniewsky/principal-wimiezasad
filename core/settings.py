@@ -31,17 +31,20 @@ ALLOWED_HOSTS = ['principal-wimiezasad.duckdns.org', 'localhost', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
-    'rest_framework',
-    'rest_framework.authtoken',
-    'api',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework.authtoken',
 
+
+    'rest_framework',
+    'rest_framework.authtoken',  
+
+
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -124,3 +127,12 @@ USE_TZ = True
 
 STATIC_URL = '/static/'                # już masz
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated', 
+    ]
+}
