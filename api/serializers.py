@@ -1,8 +1,20 @@
 from rest_framework import serializers
 from .models_fivem import Users, OwnedVehicles
-
 import json
 
+class OwnedVehiclesSerializer(serializers.ModelSerializer):
+    model_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = OwnedVehicles
+        fields = ['plate', 'model_name', 'type', 'stored', 'parking', 'mileage']
+
+    def get_model_name(self, obj):
+        try:
+            data = json.loads(obj.vehicle)
+            return data.get('model', 'Nieznany')
+        except:
+            return "Nieznany"
 
 class UsersSerializer(serializers.ModelSerializer):
     bank_money = serializers.SerializerMethodField()
@@ -13,7 +25,6 @@ class UsersSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Users
-        # Tutaj jedna, kompletna lista wszystkich pól
         fields = [
             'id', 
             'identifier', 
@@ -48,7 +59,7 @@ class UsersSerializer(serializers.ModelSerializer):
             status_data = json.loads(obj.status)
             for s in status_data:
                 if s['name'] == 'hunger':
-                    return round(s['percent'] if 'percent' in s else 0, 1)
+                    return round(s.get('percent', 0), 1)
         except: return 0
 
     def get_thirst(self, obj):
@@ -56,38 +67,8 @@ class UsersSerializer(serializers.ModelSerializer):
             status_data = json.loads(obj.status)
             for s in status_data:
                 if s['name'] == 'thirst':
-                    return round(s['percent'] if 'percent' in s else 0, 1)
+                    return round(s.get('percent', 0), 1)
         except: return 0
-
-    def get_vehicles(self, obj):
-        cars = OwnedVehicles.objects.filter(owner=obj.identifier)
-        return OwnedVehiclesSerializer(cars, many=True).data
-    
-class OwnedVehiclesSerializer(serializers.ModelSerializer):
-    model_name = serializers.SerializerMethodField()
-
-    class Meta:
-        model = OwnedVehicles
-        fields = ['plate', 'model_name', 'type', 'stored', 'parking', 'mileage']
-
-    def get_model_name(self, obj):
-        try:
-            data = json.loads(obj.vehicle)
-            return data.get('model', 'Nieznany')
-        except:
-            return "Nieznany"
-        
-class UsersSerializer(serializers.ModelSerializer):
-    vehicles = serializers.SerializerMethodField() 
-
-    class Meta:
-        model = Users
-        fields = [
-            'id', 'identifier', 'firstname', 'lastname', 
-            'bank_money', 'cash_money', 'hunger', 'thirst', 
-            'vehicles'
-        ]
-
 
     def get_vehicles(self, obj):
         cars = OwnedVehicles.objects.filter(owner=obj.identifier)
