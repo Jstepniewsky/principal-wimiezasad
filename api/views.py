@@ -34,3 +34,24 @@ class VehiclesDetailView(RetrieveUpdateDestroyAPIView):
     queryset = OwnedVehicles.objects.all()
     serializer_class = OwnedVehiclesSerializer
 
+class ServerStatsView(APIView):
+    """
+    Endpoint poza CRUD: Zlicza całkowity majątek na serwerze.
+    """
+    def get(self, request):
+        users = Users.objects.all()
+        total_bank = 0
+        
+        for user in users:
+            try:
+                # Parsujemy pole accounts, żeby wyciągnąć bank
+                accounts = json.loads(user.accounts)
+                total_bank += accounts.get('bank', 0)
+            except:
+                continue
+
+        return Response({
+            "total_players": users.count(),
+            "total_server_wealth": total_bank,
+            "average_per_player": round(total_bank / users.count(), 2) if users.count() > 0 else 0
+        })
