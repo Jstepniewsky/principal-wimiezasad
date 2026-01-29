@@ -1,12 +1,14 @@
 from django.shortcuts import render
+import json
 
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from .models_fivem import Users
-from .serializers import UsersSerializer
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
+
+from .models_fivem import Users, OwnedVehicles, UserLicenses
+from .serializers import UsersSerializer, OwnedVehiclesSerializer, UserLicensesSerializer
 
 @api_view(['GET'])
 def api_root(request, format=None):
@@ -14,6 +16,7 @@ def api_root(request, format=None):
         'gracze': reverse('users-list', request=request, format=format),
         'pojazdy': reverse('vehicles-list', request=request, format=format),
         'statystyki': reverse('server-stats', request=request, format=format),
+        'sprawdz_licencje_przyklad': reverse('check-license', kwargs={'player_id': 1}, request=request, format=format),
     })
 
 class UsersListCreateView(ListCreateAPIView):
@@ -24,9 +27,6 @@ class UsersDetailView(RetrieveUpdateDestroyAPIView):
     queryset = Users.objects.all()
     serializer_class = UsersSerializer
 
-from .models_fivem import Users, OwnedVehicles
-from .serializers import UsersSerializer, OwnedVehiclesSerializer
-
 class VehiclesListCreateView(ListCreateAPIView):
     queryset = OwnedVehicles.objects.all()
     serializer_class = OwnedVehiclesSerializer
@@ -35,24 +35,34 @@ class VehiclesDetailView(RetrieveUpdateDestroyAPIView):
     queryset = OwnedVehicles.objects.all()
     serializer_class = OwnedVehiclesSerializer
 
+
 class ServerStatsView(APIView):
-    """
-    Endpoint poza CRUD: Zlicza całkowity majątek na serwerze.
-    """
+    """Statystyki serwera (majątek całkowity)"""
     def get(self, request):
         users = Users.objects.all()
         total_bank = 0
-        
         for user in users:
             try:
-                # Parsujemy pole accounts, żeby wyciągnąć bank
                 accounts = json.loads(user.accounts)
                 total_bank += accounts.get('bank', 0)
-            except:
-                continue
-
+            except: continue
         return Response({
             "total_players": users.count(),
             "total_server_wealth": total_bank,
             "average_per_player": round(total_bank / users.count(), 2) if users.count() > 0 else 0
         })
+
+class CheckLicenseView(APIView):
+    """Dedykowane sprawdzanie prawka po ID gracza"""
+    def get(self, request, player_id):
+        try:
+            player = Users.objects.get(id=player_id)
+            user_lic = UserLicenses.objects.filter(owner=player.identifier)
+            serializer = UserLicensesSerializer(user_lic, many=True)
+            return Response({
+                "status": "success",
+                "gracz": f"{player.firstname} {player.lastname}",
+                "posiadane_licencje": serializer.data
+            })
+        except Users.DoesNotExist:
+            return Response({"error": "Nie znaleziono gracza"}, status=404)
