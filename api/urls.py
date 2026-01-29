@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('', views.api_root),
 
     path('users/', views.UsersListCreateView.as_view(), name='users-list'),
 
