@@ -16,7 +16,7 @@ def api_root(request, format=None):
         'gracze': reverse('users-list', request=request, format=format),
         'pojazdy': reverse('vehicles-list', request=request, format=format),
         'statystyki': reverse('server-stats', request=request, format=format),
-        'sprawdz_licencje_przyklad': reverse('check-license', kwargs={'player_id': 1}, request=request, format=format),
+        'sprawdz_licencje_przyklad': reverse('check-license', kwargs={'player_id': 3}, request=request, format=format),
     })
 
 class UsersListCreateView(ListCreateAPIView):
