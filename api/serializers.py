@@ -2,6 +2,17 @@ from rest_framework import serializers
 from .models_fivem import Users, OwnedVehicles
 import json
 
+class UserLicensesSerializer(serializers.ModelSerializer):
+    label = serializers.SerializerMethodField()
+
+    class Meta:
+        model = UserLicenses
+        fields = ['type', 'label']
+
+    def get_label(self, obj):
+        license_info = Licenses.objects.filter(type=obj.type).first()
+        return license_info.label if license_info else "Nieznana"
+    
 class OwnedVehiclesSerializer(serializers.ModelSerializer):
     model_name = serializers.SerializerMethodField()
 
@@ -16,12 +27,15 @@ class OwnedVehiclesSerializer(serializers.ModelSerializer):
         except:
             return "Nieznany"
 
+
+##najwazniejsza klasa
 class UsersSerializer(serializers.ModelSerializer):
     bank_money = serializers.SerializerMethodField()
     cash_money = serializers.SerializerMethodField()
     hunger = serializers.SerializerMethodField()
     thirst = serializers.SerializerMethodField()
     vehicles = serializers.SerializerMethodField()
+    licenses = serializers.SerializerMethodField()
 
     class Meta:
         model = Users
@@ -39,7 +53,8 @@ class UsersSerializer(serializers.ModelSerializer):
             'thirst',
             'playtime',
             'is_dead',
-            'vehicles'
+            'vehicles',
+            'licenses'
         ]
 
     def get_bank_money(self, obj):
@@ -73,3 +88,11 @@ class UsersSerializer(serializers.ModelSerializer):
     def get_vehicles(self, obj):
         cars = OwnedVehicles.objects.filter(owner=obj.identifier)
         return OwnedVehiclesSerializer(cars, many=True).data
+
+    def get_licenses(self, obj):
+        # Filtrujemy licencje przypisane do identifiera gracza
+        user_lic = UserLicenses.objects.filter(owner=obj.identifier)
+        return UserLicensesSerializer(user_lic, many=True).data
+    
+
+

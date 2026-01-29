@@ -6,3 +6,5 @@ http://127.0.0.1:8000/api/users/
 
 http://127.0.0.1:8000/api/users/1/ (jeśli istnieje user o ID 1)
 
+Na przyszlość
+vehicles api - zmodyfikowac by do hashu pojazdu zaciagal nazwe z neta
