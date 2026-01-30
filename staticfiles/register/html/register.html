@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rejestracja - Panel Gracza</title>
+    <style>
+        body { font-family: sans-serif; background-color: #2c3e50; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background-color: #34495e; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.5); width: 350px; }
+        h2 { text-align: center; margin-top: 0; color: #f1c40f; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: none; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px;}
+        button:hover { background-color: #2ecc71; }
+        .error { color: #e74c3c; font-size: 0.9em; margin-top: 10px; text-align: center; }
+        .success { color: #2ecc71; font-size: 0.9em; margin-top: 10px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Zarejestruj się</h2>
+    <input type="text" id="username" placeholder="Twój login do panelu">
+    <input type="password" id="password" placeholder="Hasło">
+    <input type="email" id="email" placeholder="Email (opcjonalnie)">
+    <hr style="border: 0; border-top: 1px solid #7f8c8d;">
+    <p style="font-size: 12px; text-align: center; color: #bdc3c7;">Weryfikacja postaci z gry</p>
+    <input type="text" id="identifier" placeholder="Hex ID (np. steam:11...)">
+    <input type="text" id="firstname" placeholder="Imię postaci">
+    <input type="text" id="lastname" placeholder="Nazwisko postaci">
+    
+    <button onclick="registerUser()">Utwórz konto</button>
+    <div id="message"></div>
+</div>
+
+<script>
+    async function registerUser() {
+        const msgDiv = document.getElementById('message');
+        msgDiv.innerHTML = "Przetwarzanie...";
+        msgDiv.className = "";
+
+        // Pobieramy dane z pól
+        const data = {
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value,
+            email: document.getElementById('email').value,
+            fivem_identifier: document.getElementById('identifier').value,
+            firstname: document.getElementById('firstname').value,
+            lastname: document.getElementById('lastname').value
+        };
+
+        try {
+            // Wysyłamy dane do Twojego "Bramkarza" (API)
+            const response = await fetch('/api/register/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                msgDiv.innerHTML = "✅ Sukces! " + result.message;
+                msgDiv.className = "success";
+                // Tutaj można dodać przekierowanie, np: window.location.href = '/login';
+            } else {
+                // Obsługa błędów z API
+                let errorText = "Błąd: ";
+                if(result.fivem_identifier) errorText += result.fivem_identifier + " ";
+                if(result.non_field_errors) errorText += result.non_field_errors + " ";
+                if(result.username) errorText += "Ten login jest zajęty. ";
+                
+                msgDiv.innerHTML = "❌ " + errorText;
+                msgDiv.className = "error";
+            }
+        } catch (error) {
+            msgDiv.innerHTML = "❌ Błąd połączenia z serwerem.";
+            msgDiv.className = "error";
+        }
+    }
+</script>
+
+</body>
+</html>

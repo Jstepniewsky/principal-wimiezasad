@@ -90,3 +90,6 @@ class CheckLicenseView(APIView):
             })
         except Users.DoesNotExist:
             return Response({"error": "Nie znaleziono gracza"}, status=404)
+
+def register_page(request):
+    return render(request, 'register.html')
