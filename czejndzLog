@@ -14,4 +14,23 @@ RODZIELIC MODELE DLA USERA I ADMINA
 
 #####
 
-Autentykacja poki co to tylko /api/users/
+Autentykacja https://principal-wimiezasad.duckdns.org/api-token-auth/
+lub dodac token w adminie 
+
+3. Uwierzytelnianie (Token) i Autoryzacja – DO ZROBIENIA
+
+Obecnie każdy może wejść w Twoje API. Musimy dodać "bramkarza", który sprawdzi, czy ktoś ma klucz (Token).
+DOKONCZYC GENERUJAC TOKEN
+
+4. Konta z różnym poziomem dostępu (Admin vs User) – DO ZROBIENIA
+
+Masz superusera (Admina), ale API nie rozróżnia go od zwykłego śmiertelnika. Musimy ustawić regułę:
+
+Admin: Może edytować i usuwać dane.
+
+User: Może tylko oglądać (Read Only) lub wcale nie ma dostępu.
+
+5. Rejestracja użytkownika aplikacji – DO ZROBIENIA
+
+Musisz stworzyć endpoint, który pozwoli stworzyć nowego użytkownika w systemie
+ Django (nie gracza w FiveM, tylko administratora panelu).

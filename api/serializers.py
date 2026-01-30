@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from .models_fivem import Users, OwnedVehicles, UserLicenses, Licenses
+from .models import UserProfile
+from django.contrib.auth.models import User
 import json
+
 
 class UserLicensesSerializer(serializers.ModelSerializer):
     label = serializers.SerializerMethodField()
@@ -95,4 +98,57 @@ class UsersSerializer(serializers.ModelSerializer):
         return UserLicensesSerializer(user_lic, many=True).data
     
 
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    # Pola tylko do weryfikacji (nie zapisują się w tabeli auth_user, tylko służą do sprawdzenia)
+    fivem_identifier = serializers.CharField(write_only=True, required=True)
+    firstname = serializers.CharField(write_only=True, required=True)
+    lastname = serializers.CharField(write_only=True, required=True)
+    
+    password = serializers.CharField(write_only=True)
 
+    class Meta:
+        model = User
+        fields = ['username', 'password', 'email', 'fivem_identifier', 'firstname', 'lastname']
+
+    def validate(self, data):
+        """
+        Logika weryfikacji: Czy taki gracz istnieje w FiveM?
+        """
+        identifier = data.get('fivem_identifier')
+        fname = data.get('firstname')
+        lname = data.get('lastname')
+
+        # 1. Sprawdź, czy ten identifier nie jest już zajęty w naszym panelu
+        if UserProfile.objects.filter(fivem_identifier=identifier).exists():
+            raise serializers.ValidationError({"fivem_identifier": "Ten identyfikator FiveM jest już przypisany do innego konta w panelu!"})
+
+        # 2. Sprawdź w bazie FiveM (models_fivem), czy gracz istnieje
+        # Używamy __iexact, żeby wielkość liter nie miała znaczenia (jan = Jan)
+        try:
+            fivem_user = Users.objects.get(
+                identifier=identifier, 
+                firstname__iexact=fname, 
+                lastname__iexact=lname
+            )
+        except Users.DoesNotExist:
+            raise serializers.ValidationError("Weryfikacja nieudana. Nie znaleziono w bazie FiveM gracza o takim ID, imieniu i nazwisku.")
+
+        return data
+
+    def create(self, validated_data):
+        # Wyciągamy dane FiveM (bo create_user ich nie przyjmuje)
+        identifier = validated_data.pop('fivem_identifier')
+        validated_data.pop('firstname')
+        validated_data.pop('lastname')
+
+        # Tworzymy usera Django (Login/Hasło)
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data.get('email', ''),
+            password=validated_data['password']
+        )
+
+        # Tworzymy Profil (Połączenie Usera z Identifierem)
+        UserProfile.objects.create(user=user, fivem_identifier=identifier)
+
+        return user
